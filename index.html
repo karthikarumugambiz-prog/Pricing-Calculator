@@ -278,7 +278,7 @@ function recalc(){
   $('kpiCashSub').textContent=Math.round(ar*100)+'% advance on '+fmt(ledger)+' ledger';
 
   // Cycles, growth, extraCycles kept for chart/callout calculations — not displayed
-  buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWithout,cyclesWith,minCap,extraCycles,growth,decline,ar);
+  buildChart(revenue,ledger,days,fundsUsed,cashAvailable,totalCost,cyclesWithout,cyclesWith,minCap,extraCycles,growth,decline,ar);
 }
 
 function buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWO,cyclesIF,minCap,extraCyc,growth,decline,ar){
@@ -449,7 +449,7 @@ function drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCy
     const actualPeak = peakWO * (0.94 + 0.06 * cosFactor);
     // Seasonal trough: 65% to 92% of base trough (directly applied)
     const actualTrough = baseTroughWO * (0.785 + 0.135 * cosFactor);
-    // Smooth blend: wave=+1 → peak, wave=0 → midpoint, wave=-1 → trough
+    // Smooth blend: wave=+1 → peak, wave=-1 → trough, wave=0 → midpoint
     const blend = (wave + 1) / 2; // 0 at trough, 1 at peak
     return Math.max(0, actualTrough + (actualPeak - actualTrough) * blend);
   }
