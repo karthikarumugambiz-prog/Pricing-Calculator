@@ -52,7 +52,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;hei
 .kpi-sub{font-size:11px;color:var(--text-light);margin-top:3px}
 .kpi-breakdown{font-size:11px;color:var(--text-muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
 .chart-area{position:relative;width:100%;height:360px}
-.chart-area canvas{width:100%!important;height:100%!important}
+.chart-area canvas{display:block;max-width:100%}
 .chart-legend{display:flex;gap:20px;justify-content:center;margin-top:12px}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);font-weight:500}
 .legend-swatch{width:12px;height:3px;border-radius:2px}
@@ -278,7 +278,7 @@ function recalc(){
   $('kpiCashSub').textContent=Math.round(ar*100)+'% advance on '+fmt(ledger)+' ledger';
 
   // Cycles, growth, extraCycles kept for chart/callout calculations — not displayed
-  buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWithout,cyclesWith,minCap,extraCycles,growth,decline,ar);
+  buildChart(revenue,ledger,days,fundsUsed,cashAvailable,totalCost,cyclesWithout,cyclesWith,minCap,extraCycles,growth,decline,ar);
 }
 
 function buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWO,cyclesIF,minCap,extraCyc,growth,decline,ar){
@@ -354,10 +354,11 @@ function drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCy
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.parentElement.getBoundingClientRect();
-  const W = rect.width, H = 340;
+  const W = Math.max(rect.width, 300);
+  const H = 340;
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const pad = { top: 30, right: 30, bottom: 48, left: 74 };
   const cw = W - pad.left - pad.right;
@@ -449,7 +450,7 @@ function drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCy
     const actualPeak = peakWO * (0.94 + 0.06 * cosFactor);
     // Seasonal trough: 65% to 92% of base trough (directly applied)
     const actualTrough = baseTroughWO * (0.785 + 0.135 * cosFactor);
-    // Smooth blend: wave=+1 → peak, wave=0 → midpoint, wave=-1 → trough
+    // Smooth blend: wave=+1 → peak, wave=-1 → trough, wave=0 → midpoint
     const blend = (wave + 1) / 2; // 0 at trough, 1 at peak
     return Math.max(0, actualTrough + (actualPeak - actualTrough) * blend);
   }
@@ -517,7 +518,14 @@ function drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCy
       extraCyc.toFixed(1) + ' additional cycles/year.</strong>';
 }
 
-onProductChange(); recalc();
+onProductChange();
+if (document.readyState === 'complete') {
+  recalc();
+} else {
+  window.addEventListener('load', function() {
+    setTimeout(recalc, 50);
+  });
+}
 window.addEventListener('resize', recalc);
 </script>
 </body>
