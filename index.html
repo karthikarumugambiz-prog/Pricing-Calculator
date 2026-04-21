@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibby Financial Services — Invoice Finance Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FAFAFA;--surface:#FFF;--surface-2:#F5F5F5;--border:#E5E5E5;--text:#1A1A1A;--text-muted:#737373;--text-light:#A3A3A3;--bibby-red:#E12726;--bibby-red-dark:#C41E1D;--bibby-red-glow:rgba(225,39,38,.08);--bibby-red-light:#FEF2F2;--green:#16A34A;--green-bg:#F0FDF4;--blue:#2563EB;--orange:#EA580C;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+.container{max-width:1160px;margin:0 auto;padding:28px 24px 40px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-family:'Fraunces',serif;font-size:26px;font-weight:800;margin-bottom:4px}
+.page-header .sub{color:var(--text-muted);font-size:14px}
+.main-grid{display:grid;grid-template-columns:370px 1fr;gap:24px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card+.card{margin-top:20px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-head .dot{width:8px;height:8px;border-radius:50%;background:var(--bibby-red);flex-shrink:0}
+.card-head h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+.card-body{padding:20px}
+.field{margin-bottom:18px}.field:last-child{margin-bottom:0}
+.field-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.field-label span{font-size:12px;font-weight:600;color:var(--text-muted)}
+.field-label .val{font-weight:700;color:var(--text);font-size:13px}
+.input-row{display:flex;gap:0}
+.cur-select{width:76px;flex-shrink:0;background:var(--surface-2);border:1px solid var(--border);border-right:none;border-radius:8px 0 0 8px;padding:9px 8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:var(--text);text-align:center;cursor:pointer;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23737373' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px}
+input[type="text"],input[type="number"],select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text);outline:none;transition:border .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--bibby-red);box-shadow:0 0 0 3px var(--bibby-red-glow)}
+.cur-input{border-radius:0 8px 8px 0!important}
+select{cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23737373' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+input[type="range"]{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--border);outline:none;margin-top:8px}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--bibby-red);cursor:pointer;box-shadow:0 1px 4px rgba(225,39,38,.3)}
+.product-select{font-weight:600!important;color:var(--bibby-red)!important;background:var(--bibby-red-light)!important;border-color:rgba(225,39,38,.2)!important}
+.info-box{background:var(--bibby-red-light);border:1px solid rgba(225,39,38,.15);border-radius:8px;padding:12px 14px;font-size:11.5px;color:var(--bibby-red-dark);line-height:1.5;margin-top:14px}
+.info-box strong{font-weight:700}
+.fee-inline{display:flex;align-items:center;gap:6px;margin-top:4px}
+.fee-input{width:80px!important;text-align:right;font-weight:700!important;border-bottom:2px solid var(--bibby-red)!important;border-top:none!important;border-left:none!important;border-right:none!important;border-radius:0!important;padding:4px 4px!important;background:transparent!important;font-size:14px!important}
+.fee-input:focus{box-shadow:none!important;border-bottom-color:var(--bibby-red-dark)!important}
+.fee-unit{font-size:12px;font-weight:600;color:var(--text-muted)}
+.derived-box{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px}
+.derived-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.derived-row .lbl{color:var(--text-muted);font-weight:500}
+.derived-row .val{font-weight:700;color:var(--text)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);position:relative}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.kpi.red::after{background:var(--bibby-red)}.kpi.green::after{background:var(--green)}.kpi.blue::after{background:var(--blue)}
+.kpi-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:6px}
+.kpi-value{font-size:20px;font-weight:800}
+.kpi-sub{font-size:11px;color:var(--text-light);margin-top:3px}
+.kpi-breakdown{font-size:11px;color:var(--text-muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.chart-area{position:relative;width:100%;height:360px}
+.chart-area canvas{width:100%!important;height:100%!important}
+.chart-legend{display:flex;gap:20px;justify-content:center;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);font-weight:500}
+.legend-swatch{width:12px;height:3px;border-radius:2px}
+.footer{margin-top:36px;padding:20px 0;border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-light)}
+@media(max-width:820px){.main-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr}.container{padding:20px 16px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page-header">
+    <h1>How Invoice Finance Works for Your Business</h1>
+    <p class="sub">Every number ties to a financial driver. Adjust inputs to see how invoice finance removes liquidity constraints and increases capital velocity.</p>
+  </div>
+  <div class="main-grid">
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="dot"></div><h2>Business Financials</h2></div>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label"><span>Annual Revenue</span></div>
+            <div class="input-row">
+              <select class="cur-select" id="currency" onchange="recalc()">
+                <option value="€">€ EUR</option><option value="£">£ GBP</option><option value="$">$ USD</option>
+              </select>
+              <input type="text" class="cur-input" id="revenue" value="2,000,000" oninput="handleCurrencyInput(this);recalc()" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Average Debtor Days (DSO)</span><span class="val" id="daysDisp">45 days</span></div>
+            <input type="range" id="debtorDays" min="7" max="180" value="45" oninput="recalc()" />
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Expected Funds Used in Year</span><span class="val" id="fundsUsedDisp">€1,200,000</span></div>
+            <input type="text" id="fundsUsedManual" value="1,200,000" oninput="handleCurrencyInput(this);syncFromManual('fundsUsed');recalc()" />
+            <input type="range" id="fundsUsed" min="10000" max="10000000" step="5000" value="1200000" oninput="syncFromSlider('fundsUsed');recalc()" />
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Outstanding Ledger Balance</span><span class="val" id="ledgerDisp">€500,000</span></div>
+            <input type="text" id="ledgerManual" value="500,000" oninput="handleCurrencyInput(this);syncFromManual('ledger');recalc()" />
+            <input type="range" id="ledger" min="10000" max="10000000" step="5000" value="500000" oninput="syncFromSlider('ledger');recalc()" />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="dot"></div><h2>Facility Terms</h2></div>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label"><span>Product Type</span></div>
+            <select class="product-select" id="productType" onchange="onProductChange();recalc()">
+              <option value="factoring">▾ Invoice Factoring</option>
+              <option value="discounting">▾ Invoice Discounting</option>
+            </select>
+          </div>
+          <div id="factoringFeeWrap" class="field">
+            <div class="field-label"><span style="text-decoration:underline">Service Fee (% of funds used)</span></div>
+            <div class="fee-inline"><input type="text" class="fee-input" id="serviceFeeInput" value="1.00" oninput="syncFeeFromInput('serviceFee');recalc()" /><span class="fee-unit">%</span></div>
+            <input type="range" id="serviceFee" min="0.75" max="1.5" step="0.01" value="1.0" oninput="syncFeeFromSlider('serviceFee');recalc()" />
+          </div>
+          <div id="discountingFeeWrap" class="field" style="display:none">
+            <div class="field-label"><span style="text-decoration:underline">Fixed Monthly Fee</span></div>
+            <div class="fee-inline"><span class="fee-unit" id="monthlyFeePrefix">€</span><input type="text" class="fee-input" id="monthlyFeeInput" value="900" oninput="syncFeeFromInput('monthlyFee');recalc()" style="width:100px" /><span class="fee-unit">/ month</span></div>
+            <input type="range" id="monthlyFee" min="600" max="1400" step="1" value="900" oninput="syncFeeFromSlider('monthlyFee');recalc()" />
+          </div>
+          <div class="field">
+            <div class="field-label"><span style="text-decoration:underline">Discount Charge (APR)</span></div>
+            <div class="fee-inline"><input type="text" class="fee-input" id="aprInput" value="6.50" oninput="syncFeeFromInput('apr');recalc()" /><span class="fee-unit">% APR</span></div>
+            <input type="range" id="discountAPR" min="2" max="9" step="0.01" value="6.5" oninput="syncFeeFromSlider('apr');recalc()" />
+          </div>
+          <div class="field">
+            <div class="field-label"><span style="text-decoration:underline">Advance Rate</span></div>
+            <div class="fee-inline"><input type="text" class="fee-input" id="advRateInput" value="85" oninput="syncFeeFromInput('advRate');recalc()" /><span class="fee-unit">%</span></div>
+            <input type="range" id="advRate" min="70" max="95" step="1" value="85" oninput="syncFeeFromSlider('advRate');recalc()" />
+          </div>
+          <div class="info-box"><strong>Please note:</strong> Qualification is subject to risk assessment. All charges are indicative and may vary based on individual facility terms.</div>
+        </div>
+      </div>
+    </div>
+    <!-- RIGHT -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="kpi-grid">
+        <div class="kpi green">
+          <div class="kpi-label">Service / Monthly Fee</div>
+          <div class="kpi-value" id="kpiServiceCost">—</div>
+          <div class="kpi-sub" id="kpiServiceSub"></div>
+          <div class="kpi-breakdown" id="kpiServiceBreak"></div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Estd. Discount Charge</div>
+          <div class="kpi-value" id="kpiDiscountCost">—</div>
+          <div class="kpi-sub" id="kpiDiscountSub"></div>
+          <div class="kpi-breakdown" id="kpiDiscountBreak"></div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Cash Available (estimated)</div>
+          <div class="kpi-value" id="kpiCash">—</div>
+          <div class="kpi-sub" id="kpiCashSub"></div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0;">
+        <strong>Please note:</strong> These prices are only indicative. Additional charges may apply depending on facility structure and individual terms.
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="dot"></div><h2>Working Capital Availability Over Time</h2></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="font-size:12px;color:var(--text-muted)">
+              <span style="color:var(--bibby-red);font-weight:600">- - -</span> Min. operating capital:
+            </div>
+            <div class="fee-inline" style="margin-top:0">
+              <span class="fee-unit" id="minCapPrefix">€</span>
+              <input type="text" class="fee-input" id="minCapInput" value="" oninput="handleCurrencyInput(this);recalc()" style="width:100px" />
+              <span class="fee-unit">/ month</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-light)">(default: 60% of ledger balance)</div>
+          </div>
+          <div class="chart-area"><canvas id="lineChart"></canvas></div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>Without Invoice Finance</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--green)"></div>With Invoice Finance</div>
+          </div>
+          <div id="chartCallout" style="margin-top:12px;padding:10px 14px;background:var(--green-bg);border:1px solid #BBF7D0;border-radius:8px;font-size:12px;color:var(--green);font-weight:600"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">This model provides indicative estimates only. Actual costs and benefits will vary based on facility terms, risk assessment, and trading conditions.<br>&copy; 2026 Bibby Financial Services</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const cur=()=>$('currency').value;
+const fmt=n=>cur()+Math.round(n).toLocaleString('en');
+const fmtDec=n=>cur()+Number(n).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+const parseNum=s=>Number(String(s).replace(/[^0-9.]/g,''))||0;
+function handleCurrencyInput(el){el.value=(parseInt(el.value.replace(/[^0-9]/g,''))||0).toLocaleString('en')}
+function syncFromSlider(n){$(n+'Manual').value=parseInt($(n).value).toLocaleString('en')}
+function syncFromManual(n){$(n).value=parseNum($(n+'Manual').value)}
+function syncFeeFromSlider(w){
+  if(w==='serviceFee')$('serviceFeeInput').value=parseFloat($('serviceFee').value).toFixed(2);
+  if(w==='monthlyFee')$('monthlyFeeInput').value=parseInt($('monthlyFee').value);
+  if(w==='apr')$('aprInput').value=parseFloat($('discountAPR').value).toFixed(2);
+  if(w==='advRate')$('advRateInput').value=parseInt($('advRate').value);
+}
+function syncFeeFromInput(w){
+  if(w==='serviceFee')$('serviceFee').value=Math.max(.01,Math.min(5,parseFloat($('serviceFeeInput').value)||0));
+  if(w==='monthlyFee')$('monthlyFee').value=Math.max(100,Math.min(5000,parseInt($('monthlyFeeInput').value)||0));
+  if(w==='apr')$('discountAPR').value=Math.max(1,Math.min(20,parseFloat($('aprInput').value)||0));
+  if(w==='advRate')$('advRate').value=Math.max(50,Math.min(99,parseInt($('advRateInput').value)||0));
+}
+function onProductChange(){
+  const f=$('productType').value==='factoring';
+  $('factoringFeeWrap').style.display=f?'':'none';
+  $('discountingFeeWrap').style.display=f?'none':'';
+}
+
+function recalc(){
+  const revenue=parseNum($('revenue').value);
+  const days=parseInt($('debtorDays').value);
+  const fundsUsed=parseNum($('fundsUsedManual').value);
+  const ledger=parseNum($('ledgerManual').value);
+  const apr=parseFloat($('discountAPR').value);
+  const product=$('productType').value;
+  const ar=parseInt($('advRate').value)/100;
+
+  // === DISPLAYS ===
+  $('daysDisp').textContent=days+' days';
+  $('fundsUsedDisp').textContent=fmt(fundsUsed);
+  $('ledgerDisp').textContent=fmt(ledger);
+  $('monthlyFeePrefix').textContent=cur();
+
+  // === COSTS ===
+  let serviceCostAnn=0,sLabel='';
+  if(product==='factoring'){
+    const sf=parseFloat($('serviceFee').value);
+    serviceCostAnn=fundsUsed*(sf/100);
+    sLabel=sf.toFixed(2)+'% of funds used';
+  }else{
+    const mf=parseInt($('monthlyFee').value);
+    serviceCostAnn=mf*12;
+    sLabel=fmt(mf)+' × 12 months';
+  }
+  const sMo=fmt(serviceCostAnn/12),sWk=fmt(serviceCostAnn/52),sDay=fmtDec(serviceCostAnn/365);
+
+  // Discount cost: avg balance × APR
+  const avgBalance=fundsUsed*(days/365);
+  const discountCostAnn=avgBalance*(apr/100);
+  const totalCost=serviceCostAnn+discountCostAnn;
+  const dMo=fmt(discountCostAnn/12),dWk=fmt(discountCostAnn/52),dDay=fmtDec(discountCostAnn/365);
+
+  // === CASH AVAILABLE ===
+  const cashAvailable=ledger*ar;
+
+  // === CYCLES (derived, not arbitrary) ===
+  const cyclesWithout=365/days;
+  const effectiveDays=Math.max(7,days*(1-ar));
+  const cyclesWith=365/effectiveDays;
+  const extraCycles=cyclesWith-cyclesWithout;
+
+  // === GROWTH / DECLINE ===
+  const growth = 0.07;    // 7% upward drift on green line
+  const decline = 0.01;   // 1% downward drift on orange line
+
+  // === MIN OPERATING CAPITAL ===
+  // Default: 60% of ledger. Editable by user.
+  const defaultMinCap = Math.round(ledger * 0.6);
+  const minCapRaw = parseNum($('minCapInput').value);
+  const minCap = minCapRaw > 0 ? minCapRaw : defaultMinCap;
+  if (!$('minCapInput').value || $('minCapInput').value === '0') {
+    $('minCapInput').value = defaultMinCap.toLocaleString('en');
+  }
+  $('minCapPrefix').textContent = cur();
+
+  // === KPIs ===
+  $('kpiServiceCost').textContent=fmt(serviceCostAnn)+'/yr';
+  $('kpiServiceSub').textContent=sLabel;
+  $('kpiServiceBreak').innerHTML='<span>Monthly: '+sMo+' · Weekly: '+sWk+'</span><span>Daily: '+sDay+'</span>';
+
+  $('kpiDiscountCost').textContent=fmt(discountCostAnn)+'/yr';
+  $('kpiDiscountSub').textContent=apr.toFixed(2)+'% APR on avg drawn funds';
+  $('kpiDiscountBreak').innerHTML='<span>Monthly: '+dMo+' · Weekly: '+dWk+'</span><span>Daily: '+dDay+'</span>';
+
+  $('kpiCash').textContent=fmt(cashAvailable);
+  $('kpiCashSub').textContent=Math.round(ar*100)+'% advance on '+fmt(ledger)+' ledger';
+
+  // Cycles, growth, extraCycles kept for chart/callout calculations — not displayed
+  buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWithout,cyclesWith,minCap,extraCycles,growth,decline,ar);
+}
+
+function buildChart(revenue,ledger,days,fundsUsed,cashAvail,totalCost,cyclesWO,cyclesIF,minCap,extraCyc,growth,decline,ar){
+  // === WITHOUT IF ===
+  // Use actual cycle count but cap for visual clarity
+  const nWO=Math.max(2,Math.min(12,Math.round(cyclesWO)));
+  const peakWO=ledger;
+  // Without IF: trough is driven by how much cash drains between payment cycles
+  // Each cycle, the business spends revenue/cycles worth of operating costs
+  // Approximation: trough = ledger * (1 - 1/nWO) — the longer between payments, the deeper the dip
+  const drainRatioWO = Math.min(0.7, 1 / nWO * 2.5); // deeper dip with fewer cycles
+  const baseTroughWO = Math.max(0, ledger * (1 - drainRatioWO));
+
+  // Seasonal stress: deeper troughs in Q1 and Q3
+  function seasonalStress(month){
+    return 1-0.25*Math.cos(month*Math.PI/3);
+  }
+
+  const cycleLenWO=12/nWO;
+  let woPoints=[];
+  for(let c=0;c<nWO;c++){
+    const peakMonth=c*cycleLenWO;
+    const troughMonth=peakMonth+cycleLenWO*0.85;
+    const seasonal=seasonalStress(troughMonth);
+    const baseTrough = baseTroughWO;
+    // Seasonal dips: multiply trough by seasonal factor (< 1 = deeper)
+    const adjTrough=Math.max(0, baseTrough * Math.min(1, seasonal * 0.8));
+    woPoints.push([peakMonth, peakWO]);
+    woPoints.push([troughMonth, adjTrough]);
+  }
+  woPoints.push([12, peakWO]);
+
+  // === WITH IF ===
+  // Cap visual cycles — show enough to demonstrate more frequency, not 52 zigzags
+  const nIF=Math.max(2, Math.min(16, Math.round(Math.min(cyclesIF, cyclesWO * 1.8))));
+  const cycleLenIF=12/nIF;
+  const basePeak=ledger*ar;
+  // Trough: shallower than without IF. Use GPT formula.
+  const baseTroughIF = basePeak * (0.55 + 0.25 * ar) - (totalCost * 0.3 / nIF);
+  const clampedTroughIF = Math.max(basePeak * 0.65, baseTroughIF);
+
+  let ifPoints=[];
+  for(let c=0;c<nIF;c++){
+    const peakMonth=c*cycleLenIF;
+    const troughMonth=peakMonth+cycleLenIF*0.85;
+    // Growth drift: peaks/troughs increase gently across the year
+    const gP=1+(growth*(peakMonth/12));
+    const gT=1+(growth*(troughMonth/12));
+    ifPoints.push([peakMonth, basePeak*gP]);
+    ifPoints.push([troughMonth, clampedTroughIF*gT]);
+  }
+  ifPoints.push([12, basePeak*(1+growth)]);
+
+  // === CALLOUT ===
+  const woTroughs=woPoints.filter((_,i)=>i%2===1).map(p=>p[1]);
+  const deepest=Math.min(...woTroughs);
+  const dips=deepest<minCap;
+  const monthsBelow=woTroughs.filter(t=>t<minCap).length;
+
+  $('chartCallout').innerHTML=dips
+    ?'⚡ Without invoice finance, working capital dips to <strong>'+fmt(deepest)+
+     '</strong> during '+monthsBelow+' cycle(s) — below the minimum operating threshold of '+fmt(minCap)+
+     '. With IF, the floor stays at <strong>'+fmt(Math.round(clampedTroughIF))+
+     '</strong> and capital velocity enables ~'+Math.round(growth*100)+'% organic growth → <strong>+'+extraCyc.toFixed(1)+' additional cycles/year.</strong>'
+    :'✓ Invoice finance reduces working capital variance and enables ~'+Math.round(growth*100)+
+     '% growth through increased capital velocity. <strong>+'+extraCyc.toFixed(1)+' additional cycles/year.</strong>';
+
+  drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCyc, totalCost, fundsUsed);
+}
+
+function drawIllustration(ledger, minCap, ar, growth, decline, cyclesWO, extraCyc, totalCost, fundsUsed) {
+  const canvas = $('lineChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width, H = 340;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = { top: 30, right: 30, bottom: 48, left: 74 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+  ctx.clearRect(0, 0, W, H);
+
+  // --- KEY LEVELS from inputs ---
+  const peakWO = ledger;
+  // Without IF: base trough driven by actual spend per cycle (from original v2 logic)
+  const nWaveCycles = Math.max(2, Math.round(cyclesWO));
+  const spendPerCycle = fundsUsed / nWaveCycles;
+  const baseTroughWO = Math.max(0, ledger - spendPerCycle);
+
+  const peakIF = ledger * ar;
+  const troughIF = peakIF * (0.55 + 0.25 * ar) - (totalCost * 0.3 / Math.max(4, cyclesWO));
+  const clampedTroughIF = Math.max(peakIF * 0.7, troughIF);
+  const peakIFEnd = peakIF * (1 + growth);
+
+  // --- Y SCALE ---
+  const yMax = Math.max(peakWO, peakIFEnd) * 1.18;
+  const toX = t => pad.left + t * cw;
+  const toY = v => pad.top + ch - (v / yMax) * ch;
+
+  // --- GRID ---
+  ctx.font = '11px DM Sans'; ctx.textAlign = 'right'; ctx.fillStyle = '#B0B0B0';
+  for (let i = 0; i <= 4; i++) {
+    const v = yMax * i / 4, y = toY(v);
+    ctx.strokeStyle = '#ECECEC'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.setLineDash([4, 4]);
+    ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y);
+    ctx.stroke(); ctx.setLineDash([]);
+    const label = v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? Math.round(v / 1e3) + 'K' : Math.round(v);
+    ctx.fillText(cur() + label, pad.left - 8, y + 4);
+  }
+
+  // Y label
+  ctx.save(); ctx.translate(16, pad.top + ch / 2); ctx.rotate(-Math.PI / 2);
+  ctx.font = '10px DM Sans'; ctx.fillStyle = '#A3A3A3'; ctx.textAlign = 'center';
+  ctx.fillText('Available Working Capital (' + cur() + ')', 0, 0); ctx.restore();
+
+  // --- QUARTERLY X-AXIS ---
+  const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+  ctx.textAlign = 'center'; ctx.fillStyle = '#888'; ctx.font = '12px DM Sans';
+  quarters.forEach((q, i) => ctx.fillText(q, toX((i + 0.5) / 4), H - pad.bottom + 20));
+
+  for (let i = 1; i <= 3; i++) {
+    ctx.strokeStyle = '#E8E8E8'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.setLineDash([]);
+    ctx.moveTo(toX(i / 4), pad.top); ctx.lineTo(toX(i / 4), H - pad.bottom);
+    ctx.stroke();
+  }
+
+  // --- MIN OPERATING CAPITAL LINE ---
+  const minY = toY(minCap);
+  ctx.strokeStyle = '#E12726'; ctx.lineWidth = 1.5; ctx.setLineDash([8, 5]);
+  ctx.beginPath(); ctx.moveTo(pad.left, minY); ctx.lineTo(W - pad.right, minY);
+  ctx.stroke(); ctx.setLineDash([]);
+  ctx.font = '10px DM Sans'; ctx.fillStyle = '#E12726'; ctx.textAlign = 'left';
+  ctx.fillText('Min. operating capital ' + fmt(Math.round(minCap)), pad.left + 4, minY - 7);
+
+  // --- SMOOTH CURVES ---
+  const N = 300;
+
+  // WITHOUT IF: original v2 cosine seasonal logic, made more pronounced
+  // Base trough comes from actual spend. Seasonal cosine modulates it.
+  //
+  // How it works (simple version):
+  //   1. Base trough = ledger minus what you spend per cycle
+  //   2. Cosine clock goes around twice a year (dips in Feb & Aug, peaks in May & Nov)
+  //   3. At worst months: trough drops 30-35% below base (deep trouble)
+  //   4. At best months: trough only drops 10% below base (just scraping by)
+  //
+  // Seasonal multiplier applied DIRECTLY to trough value.
+  // No amplitude math in between — 35% below means 35% below, period.
+  //
+  // How it works:
+  //   1. Wave oscillates between peak (ledger) and trough
+  //   2. When wave is at bottom, we calculate: what's the trough RIGHT NOW?
+  //   3. Seasonal cosine gives a multiplier: 0.65 (Feb/Aug) to 1.10 (May/Nov)
+  //   4. Actual trough = baseTrough × that multiplier. Done.
+  
+  const nWavesWO = Math.max(2, Math.min(5, Math.round(cyclesWO / 2)));
+  function woValue(t) {
+    const wave = Math.sin(t * nWavesWO * 2 * Math.PI); // -1 to +1
+    const monthPos = t * 12;
+    const cosFactor = Math.cos(monthPos * Math.PI / 3); // seasonal: -1 at Feb/Aug, +1 at May/Nov
+
+    // Seasonal peak: 88% to 100% of ledger
+    const actualPeak = peakWO * (0.94 + 0.06 * cosFactor);
+    // Seasonal trough: 65% to 92% of base trough (directly applied)
+    const actualTrough = baseTroughWO * (0.785 + 0.135 * cosFactor);
+    // Smooth blend: wave=+1 → peak, wave=0 → midpoint, wave=-1 → trough
+    const blend = (wave + 1) / 2; // 0 at trough, 1 at peak
+    return Math.max(0, actualTrough + (actualPeak - actualTrough) * blend);
+  }
+
+  // WITH IF: wave count follows orange + 2, simple trough formula, 3% growth drift
+  const dso = 365 / Math.max(1, cyclesWO);
+  const nWavesIF = Math.min(7, nWavesWO + 2);
+  function ifValue(t) {
+    const gm = 1 + growth * t;
+    const peak = peakIF * gm;
+    const trough = clampedTroughIF * gm;
+    const mid = (peak + trough) / 2;
+    const amp = (peak - trough) / 2;
+    return Math.max(0, mid + amp * Math.sin(t * nWavesIF * 2 * Math.PI));
+  }
+
+  // --- DRAW ---
+  function drawSmooth(fn, color, fill, lw) {
+    ctx.beginPath(); ctx.moveTo(toX(0), toY(0));
+    for (let i = 0; i <= N; i++) ctx.lineTo(toX(i / N), toY(fn(i / N)));
+    ctx.lineTo(toX(1), toY(0)); ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      if (!i) ctx.moveTo(toX(0), toY(fn(0)));
+      else ctx.lineTo(toX(i / N), toY(fn(i / N)));
+    }
+    ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash([]); ctx.stroke();
+  }
+
+  drawSmooth(woValue, '#EA580C', 'rgba(234,88,12,0.06)', 2.5);
+  drawSmooth(ifValue, '#16A34A', 'rgba(22,163,74,0.10)', 2.5);
+
+  // --- VALUE LABELS ---
+  // Find deepest WO point
+  let woMin = Infinity, woMinT = 0;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N, v = woValue(t);
+    if (v < woMin) { woMin = v; woMinT = t; }
+  }
+  ctx.font = 'bold 10px DM Sans'; ctx.fillStyle = '#EA580C'; ctx.textAlign = 'center';
+  ctx.fillText(fmt(Math.round(woMin)), toX(woMinT), toY(woMin) + 14);
+
+  // IF mid-year level
+  const ifMidVal = ifValue(0.5);
+  ctx.fillStyle = '#16A34A'; ctx.textAlign = 'center';
+  ctx.fillText(fmt(Math.round(ifMidVal)), toX(0.5), toY(ifMidVal) - 10);
+
+  // X label
+  ctx.font = '10px DM Sans'; ctx.fillStyle = '#A3A3A3'; ctx.textAlign = 'center';
+  ctx.fillText('Debt Turn Across Quarters', pad.left + cw / 2, H - 6);
+
+  // --- CALLOUT ---
+  const dips = woMin < minCap;
+  $('chartCallout').innerHTML = dips
+    ? '⚡ Without invoice finance, working capital dips to <strong>' + fmt(Math.round(woMin)) +
+      '</strong> — below the <strong>' + fmt(Math.round(minCap)) +
+      '</strong> minimum operating threshold. With IF, the floor stays at <strong>' +
+      fmt(Math.round(clampedTroughIF)) + '</strong> and capital velocity enables ~' +
+      Math.round(growth * 100) + '% organic growth → <strong>+' +
+      extraCyc.toFixed(1) + ' additional cycles/year.</strong>'
+    : '✓ Invoice finance smooths working capital and enables ~' +
+      Math.round(growth * 100) + '% growth through capital velocity. <strong>+' +
+      extraCyc.toFixed(1) + ' additional cycles/year.</strong>';
+}
+
+onProductChange(); recalc();
+window.addEventListener('resize', recalc);
+</script>
+</body>
+</html>
